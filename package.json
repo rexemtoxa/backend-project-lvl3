@@ -1,0 +1,45 @@
+{
+  "name": "page_loader_ar",
+  "version": "1.0.0",
+  "description": "load html page to storage",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest",
+    "test-publish": "npm publish --dry-run",
+    "build": "NODE_ENV=production babel src --out-dir dist --source-maps inline",
+    "prepublishOnly": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rexemtoxa/backend-project-lvl3.git"
+  },
+  "author": "Anton Rehemae",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/rexemtoxa/backend-project-lvl3/issues"
+  },
+  "homepage": "https://github.com/rexemtoxa/backend-project-lvl3#readme",
+  "devDependencies": {
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.8.4",
+    "@babel/node": "^7.8.4",
+    "@babel/plugin-proposal-pipeline-operator": "^7.8.3",
+    "@babel/preset-env": "^7.8.4",
+    "@types/jest": "^25.1.2",
+    "babel-eslint": "^10.0.3",
+    "babel-jest": "^25.1.0",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb-base": "^14.0.0",
+    "eslint-plugin-babel": "^5.3.0",
+    "eslint-plugin-import": "^2.20.0",
+    "eslint-plugin-jest": "^22.6.0",
+    "jest": "^25.1.0",
+    "jest-cli": "^25.1.0"
+  },
+  "files": [
+    "dist"
+  ],
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
