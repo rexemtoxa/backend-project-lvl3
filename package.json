@@ -34,12 +34,31 @@
     "eslint-plugin-import": "^2.20.0",
     "eslint-plugin-jest": "^22.6.0",
     "jest": "^25.1.0",
-    "jest-cli": "^25.1.0"
+    "jest-cli": "^25.1.0",
+    "nock": "^12.0.3"
   },
   "files": [
     "dist"
   ],
   "jest": {
-    "testEnvironment": "node"
+    "testEnvironment": "node",
+    "modulePathIgnorePatterns": [
+      "node_modules"
+    ],
+    "collectCoverage": true,
+    "coverageReporters": ["lcov"],
+    "coverageDirectory": "test-coverage",
+    "coverageThreshold": {
+     "global": {
+     "branches": 0,
+     "functions": 0,
+     "lines": 0,
+     "statements": 0
+     }
+    }
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "lodash": "^4.17.15"
   }
 }

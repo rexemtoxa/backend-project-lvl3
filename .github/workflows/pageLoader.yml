@@ -1,22 +1,18 @@
 # This workflow will do a clean install of node dependencies, build the source code and run tests across different versions of node
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-nodejs-with-github-actions
 
-name: Node.js CI
+name: pageLoader
 
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-
     strategy:
       matrix:
-        node-version: [10.x, 12.x]
+        node-version: 13.x
 
     steps:
     - uses: actions/checkout@v2
@@ -25,7 +21,23 @@ jobs:
       with:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
-    - run: npm run build --if-present
     - run: npm test
       env:
         CI: true
+  coverage:
+    needs: [ test ]
+    name: coverage
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@master
+    - uses: actions/setup-node@master
+      with:
+        node-version: '13'
+        - run: npm ci
+    - uses: paambaati/codeclimate-action@v2.2.4
+      env:
+        CC_TEST_REPORTER_ID: af668c4f39e7102968df910cd2a86e01faf9efc49d3185bcfe0e4482be445d42
+      with:
+        coverageCommand: npm run test --coverage --watchAll=false
+        coverageLocations:
+          "${{github.workspace}}/test-coverage/lcov.info:lcov"
