@@ -36,7 +36,7 @@ jobs:
     - uses: actions/setup-node@master
       with:
         node-version: ${{ matrix.node-version }}
-        - run: npm ci
+      - run: npm ci
     - uses: paambaati/codeclimate-action@v2.2.4
       env:
         CC_TEST_REPORTER_ID: af668c4f39e7102968df910cd2a86e01faf9efc49d3185bcfe0e4482be445d42
