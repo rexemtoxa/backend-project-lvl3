@@ -28,7 +28,7 @@ jobs:
     needs: [ test ]
     strategy:
       matrix:
-        node-version: 13.x
+        node-version: [13.x]
     name: coverage
     runs-on: ubuntu-latest
     steps:
