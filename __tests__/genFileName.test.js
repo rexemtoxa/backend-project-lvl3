@@ -4,7 +4,7 @@ test('generate file name from link', () => {
   const testcases = [
     {
       link: 'https://github.com/SeleniumHQ/docker-selenium',
-      expectedResult: 'github-com-SeleniumHQ-docker-selenium.html1',
+      expectedResult: 'github-com-SeleniumHQ-docker-selenium.html',
     },
     {
       link: 'https://ru.hexlet.io/projects/4/members/7073',

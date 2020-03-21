@@ -1,5 +1,5 @@
 import url from 'url';
-
+// eslint-disable-next-line import/prefer-default-export
 export const generateFileName = (link) => {
   const { auth, host, path } = url.parse(link);
   const partsOfName = [auth, host, path];
