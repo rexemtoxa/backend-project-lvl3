@@ -12,6 +12,6 @@ export default (url, pathToDir) => {
         fs.writeFile(pathToFile, data, 'utf-8').then(() => console.log('file was saved')),
       );
     }
-    return Promise.reject(new Error(`Request failed with status code ${status}`));
+    return Promise.reject(new Error(`Page was not save, status code is ${status}`));
   });
 };
