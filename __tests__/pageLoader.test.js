@@ -18,7 +18,9 @@ beforeAll(async () => {
   nock('http://test.positive.com')
     .get('/').reply(200, html)
     .get('/unknown/page')
-    .reply(404);
+    .reply(404)
+    .get('/nocontent/page')
+    .reply(204);
 });
 
 describe('get http request to page and save html', () => {
@@ -30,8 +32,14 @@ describe('get http request to page and save html', () => {
     expect(savedPage).toMatchSnapshot();
   });
 
-  test('page should not be saved, if code of request is not 200', async () => {
+  test('page should not be saved, if request fails', async () => {
     await expect(pageLoader('http://test.positive.com/unknown/page', tempDir)).rejects.toThrow('Request failed with status code 404');
+    await expect(fs.access(path.join(tempDir, 'test-positive-com-unknown-page.html'))).rejects
+      .toThrow("ENOENT: no such file or directory, access '/tmp/pageLoader/test-positive-com-unknown-page.html'");
+  });
+
+  test('page should not be saved, if there are no a content', async () => {
+    await expect(pageLoader('http://test.positive.com/nocontent/page', tempDir)).rejects.toThrow('Request failed with status code 204');
     await expect(fs.access(path.join(tempDir, 'test-positive-com-unknown-page.html'))).rejects
       .toThrow("ENOENT: no such file or directory, access '/tmp/pageLoader/test-positive-com-unknown-page.html'");
   });
