@@ -21,6 +21,8 @@ jobs:
         node-version: ${{ matrix.node-version }}
     - run: npm ci
     - run: npm test
+    - run: npm run build
+    - run: npm run test-publish
       env:
         CI: true
 
@@ -39,8 +41,25 @@ jobs:
     - run: npm ci
     - uses: paambaati/codeclimate-action@v2.5.5
       env:
-        CC_TEST_REPORTER_ID: af668c4f39e7102968df910cd2a86e01faf9efc49d3185bcfe0e4482be445d42
+        CC_TEST_REPORTER_ID: ${{secrets.codeClimate}}
       with:
         coverageCommand: npm run test --coverage --watchAll=false
         coverageLocations:
           "${{github.workspace}}/test-coverage/lcov.info:lcov"
+  
+
+  publish:
+    needs: [ test ]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: actions/setup-node@master
+        with:
+          node-version: 13
+          registry-url: https://www.npmjs.com/~rehemtoxa
+      - run: npm ci
+      - run: npm run build
+      - name: Publish stable
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm}}
