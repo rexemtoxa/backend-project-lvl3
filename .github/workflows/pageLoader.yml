@@ -60,13 +60,13 @@ jobs:
       - name: build package
         - run: npm ci
         - run: npm run build
-        - name: Register Token
-      run: |
-        echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > /home/runner/work/_temp/.npmrc
-        echo "_auth=$NODE_AUTH_TOKEN" >>  /home/runner/work/_temp/.npmrc
-        echo "email=<rehemtoha@gmail.com>" >>  /home/runner/work/_temp/.npmrc
-        echo "always-auth=true" >>  /home/runner/work/_temp/.npmrc
-      env:
-        NODE_AUTH_TOKEN: ${{secrets.npm}}
+      - name: Register Token
+        run: |
+          echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > /home/runner/work/_temp/.npmrc
+          echo "_auth=$NODE_AUTH_TOKEN" >>  /home/runner/work/_temp/.npmrc
+          echo "email=<rehemtoha@gmail.com>" >>  /home/runner/work/_temp/.npmrc
+          echo "always-auth=true" >>  /home/runner/work/_temp/.npmrc
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.npm}}
       - name: Publish stable
         run: npm publish
