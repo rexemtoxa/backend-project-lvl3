@@ -3,33 +3,20 @@
 
 # Page-loader
 ### Install:
-```$ npm i page_loader_ar```     <button onclick="myFunction()">Copy text</button>
+```npm i page_loader_ar```<button onclick="myFunction()" style="margin-left: 15px;">Copy</button>
 
-<code>def useage(self)</code>
 ### Usage:
 
-
-<input type="text" value="Hello World" id="myInput">
-<button onclick="myFunction()">Copy text</button>
-
-
-<!-- <script>
-function myFunction() {
-  var copyText = document.getElementById("myInput");
-  copyText.select();
-  copyText.setSelectionRange(0, 99999)
-  document.execCommand("copy");
-  alert("Copied the text: " + copyText.value);
-}
-</script> -->
-
 <script>
 function myFunction() {
-  var copyText = document.getElementById("myInput");
-  copyText.innerHTML = '<p>'
+  const code = event.target.previousSibling.textContent;
+  const tempElement = document.createElement('textarea');
+   tempElement.value = code;
+   tempElement.setAttribute('readonly', '');
+   tempElement.style = {position: 'absolute', left: '-9999px'};
+   document.body.appendChild(tempElement);
+   tempElement.select();
+   document.execCommand('copy');
+   document.body.removeChild(tempElement);
 }
-</script>
-
-<script>
-document.getElementById("myInput").innerHTML = "Text added by JavaScript code";
 </script>
