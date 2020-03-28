@@ -1,6 +1,6 @@
 {
   "name": "page_loader_ar",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "load html page to storage",
   "main": "index.js",
   "scripts": {
