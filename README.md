@@ -21,3 +21,6 @@ Options:
 ```bash
 pageLoader -o "/home/username/Desktop" https://google.com/
 file was saved
+```
+
+[![asciicast](https://asciinema.org/a/wTUsWIiSYfuMgn6OjZw5Xl6hT.svg)](https://asciinema.org/a/wTUsWIiSYfuMgn6OjZw5Xl6hT?speed=2&theme=tango)
