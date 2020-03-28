@@ -3,20 +3,21 @@
 
 # Page-loader
 ### Install:
-```npm i page_loader_ar```<button onclick="myFunction()" style="margin-left: 15px;">Copy</button>
-
+```bash
+npm i page_loader_ar
+```
 ### Usage:
+```bash
+pageLoader [options] <url>
 
-<script>
-function myFunction() {
-  const code = event.target.previousSibling.textContent;
-  const tempElement = document.createElement('textarea');
-   tempElement.value = code;
-   tempElement.setAttribute('readonly', '');
-   tempElement.style = {position: 'absolute', left: '-9999px'};
-   document.body.appendChild(tempElement);
-   tempElement.select();
-   document.execCommand('copy');
-   document.body.removeChild(tempElement);
-}
-</script>
+load and save page to the output directory
+
+Options:
+  -V, --version                  output the version number
+  -o, --output [output folder]   Output folder (default: "/path/to/current/directory")
+  -h, --help                     display help for command
+```
+### Example:
+```bash
+pageLoader -o "/home/username/Desktop" https://google.com/
+file was saved
