@@ -5,7 +5,7 @@ import { generateFileName } from './utils';
 
 
 export default (url, pathToDir) => {
-  const pathToFile = path.join(pathToDir, generateFileName(url));
+  const pathToFile = path.join(pathToDir, generateFileName(url, '.html'));
   return axios.get(url).then(({ status, data }) => {
     if (status === 200) {
       return fs.mkdir(pathToDir, { recursive: true }).then(

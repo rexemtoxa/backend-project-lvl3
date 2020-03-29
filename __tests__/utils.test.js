@@ -25,6 +25,6 @@ const testcases = [
 
 describe.each(testcases)('generate filename from link', ({ link, fileName }) => {
   test(`generate filename from ${link}`, () => {
-    expect(generateFileName(link)).toBe(fileName);
+    expect(generateFileName(link, '.html')).toBe(fileName);
   });
 });
