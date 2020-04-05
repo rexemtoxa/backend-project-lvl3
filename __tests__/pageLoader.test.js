@@ -8,7 +8,7 @@ import pageLoader from '../src';
 
 const getFolderSize = util.promisify(getFolderSizeCB);
 const genNameTempDir = () => path.join(os.tmpdir(), 'page-loader-');
-const getPathToFixture = (pathToFile) => path.join(__dirname, '__fixtures__', pathToFile);
+const getPathToFixture = (pathToFile) => path.join(__dirname, '__fixtures__', ...pathToFile);
 let tempDir;
 
 describe('get http request to page and save html', () => {
@@ -18,10 +18,10 @@ describe('get http request to page and save html', () => {
   });
 
   beforeAll(async () => {
-    const html = await fs.readFile(getPathToFixture('pageWithOutLocalResources.html'), 'utf-8');
     nock.disableNetConnect();
     nock('http://test.positive.com')
-      .get('/').reply(200, html)
+      .get('/')
+      .replyWithFile(200, getPathToFixture(['pageWithOutLocalResources.html']))
       .get('/unknown/page')
       .reply(404)
       .get('/nocontent/page')
@@ -55,14 +55,19 @@ describe('amount of file should be equal amount of local resources', () => {
   });
 
   beforeAll(async () => {
-    const htmlWithoutLocalResources = await fs.readFile(getPathToFixture('pageWithOutLocalResources.html'), 'utf-8');
-    const htmlWithLocalResources = await fs.readFile(getPathToFixture('pageWithLocalResources/pageWithLocalResources.html'), 'utf-8');
-
-    nock.disableNetConnect();
     nock('http://check.amount.local.files.com')
-      .get('/without/local/files').reply(200, htmlWithoutLocalResources)
+      .get('/without/local/files')
+      .replyWithFile(200, getPathToFixture(['pageWithOutLocalResources.html']))
       .get('/with/local/files')
-      .reply(200, htmlWithLocalResources);
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'pageWithLocalResources.html']))
+      .get('/assets/download.ico')
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'download.ico']))
+      .get('/assets/logo.jpg')
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'logo.jpg']))
+      .get('/assets/index.js')
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'index.js']))
+      .get('/assets/style.css')
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'style.css']));
   });
 
   test('page without local resources should be save without assets folders', async () => {
@@ -76,7 +81,7 @@ describe('amount of file should be equal amount of local resources', () => {
     // Act
     await pageLoader('http://check.amount.local.files.com/with/local/files', tempDir);
     // Assert
-    await expect(fs.readdir(`${tempDir}/page-with-local-resources-com_files`)).resolves.toHaveLength(4);
+    await expect(fs.readdir(`${tempDir}/check-amount-local-files-com-with-local-files_files`)).resolves.toHaveLength(4);
   });
 });
 
@@ -86,19 +91,25 @@ describe('load page with local resources and change the src', () => {
   });
 
   beforeAll(async () => {
-    const htmlWithLocalResources = await fs.readFile(getPathToFixture('pageWithLocalResources/pageWithLocalResources.html'), 'utf-8');
-
     nock.disableNetConnect();
     nock('http://check.amount.local.files.com')
       .get('/with/local/files')
-      .reply(200, htmlWithLocalResources);
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'pageWithLocalResources.html']))
+      .get('/assets/download.ico')
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'download.ico']))
+      .get('/assets/logo.jpg')
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'logo.jpg']))
+      .get('/assets/index.js')
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'index.js']))
+      .get('/assets/style.css')
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'style.css']));
   });
   test('size of page with assets should equal the size after loading', async () => {
     // Arrange
-    const expectedFolderSize = await getFolderSize(getPathToFixture('pageWithLocalResources'));
+    const expectedFolderSize = await getFolderSize(getPathToFixture(['pageWithLocalResources', 'assets']));
     // Act
     await pageLoader('http://check.amount.local.files.com/with/local/files', tempDir);
-    const actualFolderSize = await getFolderSize(tempDir);
+    const actualFolderSize = await getFolderSize(path.join(tempDir, 'check-amount-local-files-com-with-local-files_files'));
     expect(actualFolderSize).toEqual(expectedFolderSize);
   });
 });

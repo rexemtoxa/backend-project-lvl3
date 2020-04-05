@@ -52,7 +52,8 @@
   "jest": {
     "testEnvironment": "node",
     "modulePathIgnorePatterns": [
-      "node_modules"
+      "node_modules",
+      "__fixtures__"
     ],
     "collectCoverage": true,
     "coverageReporters": [
@@ -70,6 +71,7 @@
   },
   "dependencies": {
     "axios": "^0.19.2",
+    "cheerio": "^1.0.0-rc.3",
     "commander": "^5.0.0",
     "lodash": "^4.17.15"
   },
