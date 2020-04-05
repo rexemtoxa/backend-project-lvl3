@@ -7,3 +7,8 @@ export const generateFileName = (link, type) => {
     .replace(/[\W]/g, '-')
     .replace(/-{1,}/g, '-')}${type}`.replace(/-html\.html$/, `${type}`);
 };
+
+export const isLocalResource = (source, baseHost) => {
+  const { hostname } = url.parse(source);
+  return !hostname || hostname === baseHost;
+};

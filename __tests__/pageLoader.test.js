@@ -36,13 +36,17 @@ describe('get http request to page and save html', () => {
   });
 
   test('page should not be saved, if request fails', async () => {
+    // Act
     await expect(pageLoader('http://test.positive.com/unknown/page', tempDir)).rejects.toThrow('Request failed with status code 404');
+    // Assert
     await expect(fs.access(path.join(tempDir, 'test-positive-com-unknown-page.html'))).rejects
       .toThrow(/ENOENT: no such file or directory, access '\/tmp\/page-loader-.*\/test-positive-com-unknown-page.html'$/);
   });
 
   test('page should not be saved, if there are no a content', async () => {
+    // Act
     await expect(pageLoader('http://test.positive.com/nocontent/page', tempDir)).rejects.toThrow('Page was not save, status code is 204');
+    // Assert
     await expect(fs.access(path.join(tempDir, 'test-positive-com-nocontent-page.html'))).rejects
       .toThrow(/ENOENT: no such file or directory, access '\/tmp\/page-loader-.*\/test-positive-com-nocontent-page.html'$/);
   });
@@ -86,6 +90,7 @@ describe('amount of file should be equal amount of local resources', () => {
 });
 
 describe('load page with local resources and change the src', () => {
+  // Arrange
   beforeEach(async () => {
     tempDir = await fs.mkdtemp(genNameTempDir());
   });
@@ -110,6 +115,7 @@ describe('load page with local resources and change the src', () => {
     // Act
     await pageLoader('http://check.amount.local.files.com/with/local/files', tempDir);
     const actualFolderSize = await getFolderSize(path.join(tempDir, 'check-amount-local-files-com-with-local-files_files'));
+    // Assert
     expect(actualFolderSize).toEqual(expectedFolderSize);
   });
 });
