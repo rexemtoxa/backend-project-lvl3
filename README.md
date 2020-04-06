@@ -24,3 +24,5 @@ file was saved
 ```
 
 [![asciicast](https://asciinema.org/a/wTUsWIiSYfuMgn6OjZw5Xl6hT.svg)](https://asciinema.org/a/wTUsWIiSYfuMgn6OjZw5Xl6hT?speed=2&theme=tango)
+
+[![asciicast](https://asciinema.org/a/bIIQwPyHtXUW3GGqWiBf2OZ1N.svg)](https://asciinema.org/a/bIIQwPyHtXUW3GGqWiBf2OZ1N?speed=2&theme=tango)

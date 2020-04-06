@@ -4,7 +4,7 @@ import path from 'path';
 import cheerio from 'cheerio';
 import _ from 'lodash';
 import url from 'url';
-import { generateFileName, isLocalResource } from './utils';
+import { generateFileName, isLocalResource, getLocalFileName } from './utils';
 import changeLocalResorces from './changeHtmlPage';
 
 const getLinksLocalResources = (htmlPage, baseURL) => {
@@ -31,7 +31,7 @@ const saveResorces = (listOfLinks, pathToOutputDir) => {
     .then((responses) => responses
       .filter(({ status }) => status === 'fulfilled')
       .forEach(({ value }) => {
-        const fileName = path.basename(value.config.url);
+        const fileName = getLocalFileName(value.config.url);
         value.data.pipe(createWriteStream(path.join(pathToOutputDir, fileName)));
       }));
 };

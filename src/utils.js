@@ -1,8 +1,10 @@
 import url from 'url';
-// eslint-disable-next-line import/prefer-default-export
+import path from 'path';
+
 export const generateFileName = (link, type) => {
-  const { auth, host, path } = url.parse(link);
-  const partsOfName = [auth, host, path];
+  const { auth, host } = url.parse(link);
+  const pathToResource = url.parse(link).path;
+  const partsOfName = [auth, host, pathToResource];
   return `${partsOfName.filter((partOfName) => partOfName !== null && partOfName).join('-').replace(/-\/$/, '')
     .replace(/[\W]/g, '-')
     .replace(/-{1,}/g, '-')}${type}`.replace(/-html\.html$/, `${type}`);
@@ -11,4 +13,9 @@ export const generateFileName = (link, type) => {
 export const isLocalResource = (source, baseHost) => {
   const { hostname } = url.parse(source);
   return !hostname || hostname === baseHost;
+};
+
+export const getLocalFileName = (link) => {
+  const { base, ext } = path.parse(link);
+  return !ext ? `${base}.html` : base;
 };

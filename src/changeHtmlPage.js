@@ -2,12 +2,12 @@ import url from 'url';
 import path from 'path';
 import cheerio from 'cheerio';
 import _ from 'lodash';
-import { isLocalResource } from './utils';
+import { isLocalResource, getLocalFileName } from './utils';
 
 const tagsWithHrefAttribut = new Set(['A', 'AREA', 'BASE', 'LINK']);
 
 const changeSourceByType = (element, type, outputFolder) => {
-  const fileName = path.basename(cheerio(element).attr(type));
+  const fileName = getLocalFileName(cheerio(element).attr(type));
   const newLink = path.join(outputFolder, fileName);
   cheerio(element).attr(type, newLink);
 };
