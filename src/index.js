@@ -25,7 +25,7 @@ const saveResorces = (listOfLinks, pathToOutputDir) => {
   }));
   requests.forEach((promise) => promise
     .catch((error) => {
-      console.error(`failed to load resource ${error.config.url}`);
+      console.error(`failed to load resource ${error.config.url} because ${error.message}`);
     }));
   return fs.mkdir(pathToOutputDir).then(() => Promise.allSettled(requests))
     .then((responses) => responses
