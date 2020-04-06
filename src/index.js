@@ -2,7 +2,7 @@ import axios from 'axios';
 import { promises as fs, createWriteStream } from 'fs';
 import path from 'path';
 import cheerio from 'cheerio';
-import _ from 'lodash';
+import { isUndefined } from 'lodash';
 import url from 'url';
 import { generateFileName, isLocalResource, getLocalFileName } from './utils';
 import changeLocalResorces from './changeHtmlPage';
@@ -10,7 +10,7 @@ import changeLocalResorces from './changeHtmlPage';
 const getLinksLocalResources = (htmlPage, baseURL) => {
   const $ = cheerio.load(htmlPage);
   return $('[src], [href]').toArray()
-    .map((element) => (_.isUndefined($(element).attr('src')) ? $(element).attr('href') : $(element).attr('src')))
+    .map((element) => (isUndefined($(element).attr('src')) ? $(element).attr('href') : $(element).attr('src')))
     .filter((link) => (isLocalResource(link, url.parse(baseURL).hostname)))
     .map((localLink) => (new URL(localLink, new URL(baseURL).origin)).href);
 };
