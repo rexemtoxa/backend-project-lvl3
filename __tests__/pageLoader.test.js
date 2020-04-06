@@ -107,7 +107,9 @@ describe('load page with local resources and change the src', () => {
       .get('/assets/index.js')
       .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'index.js']))
       .get('/assets/style.css')
-      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'style.css']));
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'style.css']))
+      .get('/assets/error')
+      .reply(500);
   });
   test('size of page with assets should equal the size after loading', async () => {
     // Arrange

@@ -23,29 +23,33 @@ const saveResorces = (listOfLinks, pathToOutputDir) => {
     url: link,
     responseType: 'stream',
   }));
-  return fs.mkdir(pathToOutputDir).then(() => axios.all(requests)
-    .then((responses) => responses.forEach((response) => {
-      const fileName = path.basename(response.config.url);
-      response.data.pipe(createWriteStream(path.join(pathToOutputDir, fileName)));
-    })));
+  requests.forEach((promise) => promise
+    .catch((error) => {
+      console.error(`failed to load resource ${error.config.url}`);
+    }));
+  return fs.mkdir(pathToOutputDir).then(() => Promise.allSettled(requests))
+    .then((responses) => responses
+      .filter(({ status }) => status === 'fulfilled')
+      .forEach(({ value }) => {
+        const fileName = path.basename(value.config.url);
+        value.data.pipe(createWriteStream(path.join(pathToOutputDir, fileName)));
+      }));
 };
-
 
 export default (link, pathToDir) => {
   const pathToFile = path.join(pathToDir, generateFileName(link, '.html'));
   return axios.get(link).then(({ status, data }) => {
-    if (status === 200) {
-      return fs.mkdir(pathToDir, { recursive: true }).then(() => {
-        const localRecources = getLinksLocalResources(data, link);
-        if (!hasLocalResources(localRecources)) {
-          return fs.writeFile(pathToFile, data, 'utf-8').then(() => console.log('file was saved'));
-        }
-        const pathToLocalFilesDir = path.join(pathToDir, generateFileName(link, '_files'));
-        const updatedHtml = changeLocalResorces(data, localRecources, pathToLocalFilesDir);
-        return saveResorces(localRecources, pathToLocalFilesDir)
-          .then(() => fs.writeFile(pathToFile, updatedHtml, 'utf-8'));
-      });
-    }
-    return Promise.reject(new Error(`Page was not save, status code is ${status}`));
+    if (status !== 200) return Promise.reject(new Error(`Page was not save, status code is ${status}`));
+    return fs.mkdir(pathToDir, { recursive: true }).then(() => {
+      const localRecources = getLinksLocalResources(data, link);
+      if (!hasLocalResources(localRecources)) {
+        return fs.writeFile(pathToFile, data, 'utf-8').then(() => console.log('page was saved'));
+      }
+      const pathToLocalFilesDir = path.join(pathToDir, generateFileName(link, '_files'));
+      const updatedHtml = changeLocalResorces(data, pathToLocalFilesDir, link);
+      return saveResorces(localRecources, pathToLocalFilesDir)
+        .then(() => fs.writeFile(pathToFile, updatedHtml, 'utf-8'))
+        .finally(() => console.log('page was saved'));
+    });
   });
 };

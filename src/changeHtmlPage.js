@@ -1,6 +1,8 @@
 import url from 'url';
 import path from 'path';
 import cheerio from 'cheerio';
+import _ from 'lodash';
+import { isLocalResource } from './utils';
 
 const tagsWithHrefAttribut = new Set(['A', 'AREA', 'BASE', 'LINK']);
 
@@ -18,12 +20,15 @@ const changeSourceElement = (element, outputFolder) => {
   }
 };
 
-export default (htmlPage, localResources, outputFolder) => {
-  const dom = cheerio.load(htmlPage);
-  localResources.forEach((link) => {
-    const { pathname } = url.parse(link);
-    const currentElement = dom(`[src='${pathname.slice(1)}'], [href='${pathname.slice(1)}']`);
-    changeSourceElement(currentElement, outputFolder);
+export default (htmlPage, outputFolder, baseURL) => {
+  const $ = cheerio.load(htmlPage);
+  const elementsWithLocalResource = $('[src], [href]').toArray()
+    .filter((element) => {
+      const link = _.isUndefined($(element).attr('src')) ? $(element).attr('href') : $(element).attr('src');
+      return isLocalResource(link, url.parse(baseURL).hostname);
+    });
+  elementsWithLocalResource.forEach((element) => {
+    changeSourceElement(element, outputFolder);
   });
-  return dom.html();
+  return $.html();
 };
