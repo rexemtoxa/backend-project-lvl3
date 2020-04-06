@@ -71,7 +71,9 @@ describe('amount of file should be equal amount of local resources', () => {
       .get('/assets/index.js')
       .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'index.js']))
       .get('/assets/style.css')
-      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'style.css']));
+      .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'style.css']))
+      .get('/assets/error')
+      .replyWithError({ message: 'went smth wrong', status: 500 });
   });
 
   test('page without local resources should be save without assets folders', async () => {
@@ -109,7 +111,7 @@ describe('load page with local resources and change the src', () => {
       .get('/assets/style.css')
       .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'style.css']))
       .get('/assets/error')
-      .reply(500);
+      .replyWithError({ message: 'went smth wrong', status: 500 });
   });
   test('size of page with assets should equal the size after loading', async () => {
     // Arrange
