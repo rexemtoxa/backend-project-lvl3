@@ -4,7 +4,10 @@ import os from 'os';
 import path from 'path';
 import getFolderSizeCB from 'get-folder-size';
 import util from 'util';
+import debug from 'debug';
 import pageLoader from '../src';
+
+const logger = debug('nock');
 
 const getFolderSize = util.promisify(getFolderSizeCB);
 const genNameTempDir = () => path.join(os.tmpdir(), 'page-loader-');
@@ -25,7 +28,8 @@ describe('get http request to page and save html', () => {
       .get('/unknown/page')
       .reply(404)
       .get('/nocontent/page')
-      .reply(204);
+      .reply(204)
+      .log(logger);
   });
   test('save page if response returns status code 200', async () => {
     // Act
@@ -73,7 +77,8 @@ describe('amount of file should be equal amount of local resources', () => {
       .get('/assets/style.css')
       .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'style.css']))
       .get('/assets/error')
-      .replyWithError({ message: 'went smth wrong', status: 500 });
+      .replyWithError({ message: 'went smth wrong', status: 500 })
+      .log(logger);
   });
 
   test('page without local resources should be save without assets folders', async () => {
@@ -111,7 +116,8 @@ describe('load page with local resources and change the src', () => {
       .get('/assets/style.css')
       .replyWithFile(200, getPathToFixture(['pageWithLocalResources', 'assets', 'style.css']))
       .get('/assets/error')
-      .replyWithError({ message: 'went smth wrong', status: 500 });
+      .replyWithError({ message: 'went smth wrong', status: 500 })
+      .log(logger);
   });
   test('size of page with assets should equal the size after loading', async () => {
     // Arrange
