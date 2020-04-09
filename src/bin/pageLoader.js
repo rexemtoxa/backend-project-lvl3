@@ -9,5 +9,8 @@ program
   .option('-o, --output [output folder] ', 'Output folder', process.cwd())
   .arguments('<url>')
   .action((url) => (
-    pageLoader(url, program.output)))
+    pageLoader(url, program.output).catch((err) => {
+      console.log(err.message);
+      process.exit(1);
+    })))
   .parse(process.argv);

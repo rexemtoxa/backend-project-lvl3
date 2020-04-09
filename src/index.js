@@ -47,17 +47,15 @@ const saveResorces = (listOfLinks, pathToOutputDir) => {
     responseType: 'stream',
   }));
   requests.forEach((promise) => promise
-    .catch((error) => {
-      log.warning(`failed to load resource ${error.config.url} because ${error.message}`);
-    }));
-  return fs.mkdir(pathToOutputDir).then(() => Promise.allSettled(requests))
+    .catch((error) => console.log(`failed to load resource ${error.config.url} because ${error.message}`)));
+  return Promise.allSettled(requests)
     .then((responses) => responses
       .filter(({ status }) => status === 'fulfilled')
       .forEach(({ value }) => {
         const fileName = getLocalFileName(value.config.url);
         log.info(`saving ${fileName}`);
         value.data.pipe(createWriteStream(path.join(pathToOutputDir, fileName)));
-      })).catch((reason) => log.error(reason));
+      }));
 };
 
 export default (link, pathToDir) => {
@@ -67,15 +65,17 @@ export default (link, pathToDir) => {
     return fs.mkdir(pathToDir, { recursive: true }).then(() => {
       const localRecources = getLinksLocalResources(data, link);
       if (!hasLocalResources(localRecources)) {
-        return fs.writeFile(pathToFile, data, 'utf-8').then(() => log.info('page was saved'))
-          .catch((reason) => log.error(reason));
+        return fs.writeFile(pathToFile, data, 'utf-8').then(() => log.info('page was saved'));
       }
       log.info('changing of html');
       const pathToLocalFilesDir = path.join(pathToDir, generateFileName(link, '_files'));
       const updatedHtml = changeLocalResorces(data, pathToLocalFilesDir, link);
-      return saveResorces(localRecources, pathToLocalFilesDir)
-        .then(() => fs.writeFile(pathToFile, updatedHtml, 'utf-8'))
-        .finally(() => log.info('page was saved'));
+      return fs.mkdir(pathToLocalFilesDir)
+        .then(() => saveResorces(localRecources, pathToLocalFilesDir))
+        .then(() => fs.writeFile(pathToFile, updatedHtml, 'utf-8'));
     });
+  }).catch((error) => {
+    log.error(error);
+    throw new Error(error);
   });
 };

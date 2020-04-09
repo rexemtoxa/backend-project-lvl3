@@ -129,3 +129,11 @@ describe('load page with local resources and change the src', () => {
     expect(actualFolderSize).toEqual(expectedFolderSize);
   });
 });
+
+describe('error scenarios', () => {
+  test('not have a permission te create a dir', async () => {
+    nock('http://test.positive.com')
+      .get('/').reply(200);
+    await expect(pageLoader('http://test.positive.com/', '/path_new_dir')).rejects.toThrow("EACCES: permission denied, mkdir '/path_new_dir'");
+  });
+});
