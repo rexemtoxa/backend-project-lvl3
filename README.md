@@ -30,3 +30,5 @@ file was saved
 [![asciicast](https://asciinema.org/a/TXPqTwY3S4n7shmfIvxmkgx5G.svg)](https://asciinema.org/a/TXPqTwY3S4n7shmfIvxmkgx5G?speed=2&theme=tango)
 
 [![asciicast](https://asciinema.org/a/mUMcClFEfTnKd0TiO6xzMs5OS.svg)](https://asciinema.org/a/mUMcClFEfTnKd0TiO6xzMs5OS?speed=2&theme=tango)
+
+[![asciicast](https://asciinema.org/a/KdeQbkADtmMZqrG8evhMKTgQe.svg)](https://asciinema.org/a/KdeQbkADtmMZqrG8evhMKTgQe?speed=2&theme=tango)

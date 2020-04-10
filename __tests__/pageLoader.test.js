@@ -49,7 +49,7 @@ describe('get http request to page and save html', () => {
 
   test('page should not be saved, if there are no a content', async () => {
     // Act
-    await expect(pageLoader('http://test.positive.com/nocontent/page', tempDir)).rejects.toThrow('Page was not save, status code is 204');
+    await expect(pageLoader('http://test.positive.com/nocontent/page', tempDir)).rejects.toThrow('Page was not saved, status code is 204');
     // Assert
     await expect(fs.access(path.join(tempDir, 'test-positive-com-nocontent-page.html'))).rejects
       .toThrow(/ENOENT: no such file or directory, access '\/tmp\/page-loader-.*\/test-positive-com-nocontent-page.html'$/);

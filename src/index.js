@@ -6,6 +6,7 @@ import { isUndefined } from 'lodash';
 import url from 'url';
 import debug from 'debug';
 import axiosLog from 'axios-debug-log';
+import Listr from 'listr';
 import { generateFileName, isLocalResource, getLocalFileName } from './utils';
 import changeLocalResorces from './changeHtmlPage';
 
@@ -41,27 +42,33 @@ const hasLocalResources = (resources) => resources.length > 0;
 
 const saveResorces = (listOfLinks, pathToOutputDir) => {
   log.info('dowloading local resources');
-  const requests = listOfLinks.map((link) => axios({
-    method: 'get',
-    url: link,
-    responseType: 'stream',
+  const requests = listOfLinks.map((link) => ({
+    link,
+    promise: axios({
+      method: 'get',
+      url: link,
+      responseType: 'stream',
+    }),
   }));
-  requests.forEach((promise) => promise
-    .catch((error) => console.log(`failed to load resource ${error.config.url} because ${error.message}`)));
-  return Promise.allSettled(requests)
-    .then((responses) => responses
-      .filter(({ status }) => status === 'fulfilled')
-      .forEach(({ value }) => {
-        const fileName = getLocalFileName(value.config.url);
+
+  const tasks = requests.map(({ link, promise }) => (
+    {
+      title: `dowloading from ${link}`,
+      task: () => promise.then(({ data }) => {
+        const fileName = getLocalFileName(data.responseUrl);
         log.info(`saving ${fileName}`);
-        value.data.pipe(createWriteStream(path.join(pathToOutputDir, fileName)));
-      }));
+        data.pipe(createWriteStream(path.join(pathToOutputDir, fileName)));
+      }),
+    }
+  ));
+  return new Listr(tasks, { concurrent: true, exitOnError: false })
+    .run().catch((error) => log.error(error));
 };
 
 export default (link, pathToDir) => {
   const pathToFile = path.join(pathToDir, generateFileName(link, '.html'));
   return axios.get(link).then(({ status, data }) => {
-    if (status !== 200) return Promise.reject(new Error(`Page was not save, status code is ${status}`));
+    if (status !== 200) return Promise.reject(new Error(`Page was not saved, status code is ${status}`));
     return fs.mkdir(pathToDir, { recursive: true }).then(() => {
       const localRecources = getLinksLocalResources(data, link);
       if (!hasLocalResources(localRecources)) {

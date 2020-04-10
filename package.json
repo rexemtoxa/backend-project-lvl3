@@ -1,6 +1,6 @@
 {
   "name": "page_loader_ar",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "load html page to storage",
   "main": "index.js",
   "scripts": {
@@ -75,6 +75,7 @@
     "cheerio": "^1.0.0-rc.3",
     "commander": "^5.0.0",
     "debug": "^4.1.1",
+    "listr": "^0.14.3",
     "lodash": "^4.17.15"
   },
   "bin": {
