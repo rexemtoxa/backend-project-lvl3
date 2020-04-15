@@ -90,3 +90,22 @@ exports[`get http request to page and save html save page if response returns st
    </body>
 </html>"
 `;
+
+exports[`load page with local resources and change the src size of page with assets should equal the size after loading 1`] = `
+"// here should be a lot of js code
+
+const fakeFunction = () => '<div><h1>other fake page, and not awesome</h1></div>';
+fakeFunction();
+"
+`;
+
+exports[`load page with local resources and change the src size of page with assets should equal the size after loading 2`] = `
+"p {
+  border-style: solid;
+  border-top: thick double #ff0000;
+}
+body {
+  background-color: black;
+  color: aqua;
+}"
+`;
