@@ -8,7 +8,7 @@ on:
     branches: [ master ]
 
 jobs:
-  test:
+  main_job:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -25,46 +25,13 @@ jobs:
     - run: npm run test-publish
       env:
         CI: true
-
-  coverage:
-    needs: [ test ]
-    strategy:
-      matrix:
-        node-version: [13.x]
-    name: coverage
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@master
-    - uses: actions/setup-node@master
-      with:
-        node-version: ${{ matrix.node-version }}
-    - run: npm ci
-    - uses: paambaati/codeclimate-action@v2.5.5
-      env:
         CC_TEST_REPORTER_ID: ${{secrets.codeClimate}}
+        NPM_AUTH_TOKEN: ${{secrets.npm}}
+    - name: coverage
+    - uses: paambaati/codeclimate-action@v2.5.5
       with:
         coverageCommand: npm run test --coverage --watchAll=false
         coverageLocations:
           "${{github.workspace}}/test-coverage/lcov.info:lcov"
-  
-
-  publish:
-    needs: [ test ]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@master
-      - uses: actions/setup-node@master
-        with:
-          node-version: 13
-          registry-url: 'https://registry.npmjs.org'
-      - run: npm ci
-      - run: npm run build
-      - run: |
-          echo "//registry.npmjs.org/:_authToken=$NODE_AUTH_TOKEN" > /home/runner/work/_temp/.npmrc
-          echo "_auth=$NODE_AUTH_TOKEN" >>  /home/runner/work/_temp/.npmrc
-          echo "email=<rehemtoha@gmail.com>" >>  /home/runner/work/_temp/.npmrc
-          echo "always-auth=true" >>  /home/runner/work/_temp/.npmrc
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.npm}}
-      - name: Publish stable
-        run: npm publish
+    - name: publish
+    - uses: pascalgn/npm-publish-action@4f4bf159e299f65d21cd1cbd96fc5d53228036df
