@@ -26,7 +26,6 @@ jobs:
       env:
         CI: true
         CC_TEST_REPORTER_ID: ${{secrets.codeClimate}}
-        NPM_AUTH_TOKEN: ${{secrets.npm}}
     - name: coverage
       uses: paambaati/codeclimate-action@v2.5.5
       with:
@@ -34,4 +33,7 @@ jobs:
         coverageLocations:
           "${{github.workspace}}/test-coverage/lcov.info:lcov"
     - name: publish
-      uses: pascalgn/npm-publish-action@4f4bf159e299f65d21cd1cbd96fc5d53228036df
+      uses: primer/publish@master
+      env:
+        NPM_AUTH_TOKEN: ${{secrets.npm}}
+        args: '--dry-run'
