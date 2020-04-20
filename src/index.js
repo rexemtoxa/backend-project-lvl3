@@ -67,21 +67,18 @@ const saveResorces = (listOfLinks, pathToOutputDir) => {
 
 export default (link, pathToDir) => {
   const pathToFile = path.join(pathToDir, generateFileName(link, '.html'));
-  return axios.get(link).then(({ status, data }) => {
-    if (status !== 200) return Promise.reject(new Error(`Page was not saved, status code is ${status}`));
-    return fs.mkdir(pathToDir, { recursive: true }).then(() => {
-      const localRecources = getLinksLocalResources(data, link);
-      if (!hasLocalResources(localRecources)) {
-        return fs.writeFile(pathToFile, data, 'utf-8').then(() => log.info('page was saved'));
-      }
-      log.info('changing of html');
-      const pathToLocalFilesDir = path.join(pathToDir, generateFileName(link, '_files'));
-      const updatedHtml = changeLocalResorces(data, pathToLocalFilesDir, link);
-      return fs.mkdir(pathToLocalFilesDir)
-        .then(() => saveResorces(localRecources, pathToLocalFilesDir))
-        .then(() => fs.writeFile(pathToFile, updatedHtml, 'utf-8'));
-    });
-  }).catch((error) => {
+  return axios.get(link).then(({ data }) => fs.mkdir(pathToDir, { recursive: true }).then(() => {
+    const localRecources = getLinksLocalResources(data, link);
+    if (!hasLocalResources(localRecources)) {
+      return fs.writeFile(pathToFile, data, 'utf-8').then(() => log.info('page was saved'));
+    }
+    log.info('changing of html');
+    const pathToLocalFilesDir = path.join(pathToDir, generateFileName(link, '_files'));
+    const updatedHtml = changeLocalResorces(data, pathToLocalFilesDir, link);
+    return fs.mkdir(pathToLocalFilesDir)
+      .then(() => saveResorces(localRecources, pathToLocalFilesDir))
+      .then(() => fs.writeFile(pathToFile, updatedHtml, 'utf-8'));
+  })).catch((error) => {
     log.error(error);
     throw new Error(error);
   });

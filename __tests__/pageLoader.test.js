@@ -24,8 +24,6 @@ describe('get http request to page and save html', () => {
       .replyWithFile(200, getPathToFixture(['pageWithOutLocalResources.html']))
       .get('/unknown/page')
       .reply(404)
-      .get('/nocontent/page')
-      .reply(204)
       .log(logger);
   });
   test('save page if response returns status code 200', async () => {
@@ -42,14 +40,6 @@ describe('get http request to page and save html', () => {
     // Assert
     await expect(fs.access(path.join(tempDir, 'test-positive-com-unknown-page.html'))).rejects
       .toThrow(/ENOENT: no such file or directory, access '\/tmp\/page-loader-.*\/test-positive-com-unknown-page.html'$/);
-  });
-
-  test('page should not be saved, if there are no a content', async () => {
-    // Act
-    await expect(pageLoader('http://test.positive.com/nocontent/page', tempDir)).rejects.toThrow('Page was not saved, status code is 204');
-    // Assert
-    await expect(fs.access(path.join(tempDir, 'test-positive-com-nocontent-page.html'))).rejects
-      .toThrow(/ENOENT: no such file or directory, access '\/tmp\/page-loader-.*\/test-positive-com-nocontent-page.html'$/);
   });
 });
 
