@@ -2,7 +2,6 @@ import axios from 'axios';
 import { promises as fs, createWriteStream } from 'fs';
 import path from 'path';
 import cheerio from 'cheerio';
-import { isUndefined } from 'lodash';
 import url from 'url';
 import debug from 'debug';
 import axiosLog from 'axios-debug-log';
@@ -30,12 +29,24 @@ axiosLog({
   },
 });
 
+const mappingAttributes = {
+  link: 'href',
+  img: 'src',
+  script: 'src',
+  a: 'href',
+};
+
 const getLinksLocalResources = (htmlPage, baseURL) => {
   const $ = cheerio.load(htmlPage);
-  return $('[src], [href]').toArray()
-    .map((element) => (isUndefined($(element).attr('src')) ? $(element).attr('href') : $(element).attr('src')))
-    .filter((link) => (isLocalResource(link, url.parse(baseURL).hostname)))
-    .map((localLink) => (new URL(localLink, new URL(baseURL).origin)).href);
+
+  return Object.keys(mappingAttributes)
+    .reduce((acc, tagName) => [...acc, ...$(tagName).toArray()], [])
+    .reduce((acc, node) => {
+      const { name } = node;
+      const link = $(node).attr(mappingAttributes[name]);
+      return isLocalResource(link, url.parse(baseURL).hostname)
+        ? [...acc, (new URL(link, new URL(baseURL).origin)).href] : acc;
+    }, []);
 };
 
 const hasLocalResources = (resources) => resources.length > 0;
