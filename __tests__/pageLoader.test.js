@@ -35,11 +35,13 @@ describe('get http request to page and save html', () => {
   });
 
   test('page should not be saved, if request fails', async () => {
+    // Arrange
+    const pathToOutputFile = path.join(tempDir, 'test-positive-com-unknown-page.html');
+    const regexErrorMessage = /ENOENT: no such file or directory, access '\/tmp\/page-loader-.*\/test-positive-com-unknown-page.html'$/;
     // Act
     await expect(pageLoader('http://test.positive.com/unknown/page', tempDir)).rejects.toThrow('Request failed with status code 404');
     // Assert
-    await expect(fs.access(path.join(tempDir, 'test-positive-com-unknown-page.html'))).rejects
-      .toThrow(/ENOENT: no such file or directory, access '\/tmp\/page-loader-.*\/test-positive-com-unknown-page.html'$/);
+    await expect(fs.access(pathToOutputFile)).rejects.toThrow(regexErrorMessage);
   });
 });
 
@@ -84,6 +86,7 @@ describe('load page with local resources and change the src', () => {
 
 describe('error scenarios', () => {
   test('not have a permission te create a dir', async () => {
+    // Arrange
     nock('http://test.positive.com')
       .get('/').reply(200);
     await expect(pageLoader('http://test.positive.com/', '/path_new_dir')).rejects.toThrow("EACCES: permission denied, mkdir '/path_new_dir'");
