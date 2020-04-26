@@ -2,7 +2,6 @@ import axios from 'axios';
 import { promises as fs, createWriteStream } from 'fs';
 import path from 'path';
 import cheerio from 'cheerio';
-import url from 'url';
 import debug from 'debug';
 import axiosLog from 'axios-debug-log';
 import Listr from 'listr';
@@ -29,6 +28,8 @@ axiosLog({
   },
 });
 
+const genFullLinkFromLocalResource = (localLink, origin) => `${new URL(localLink, origin)}`;
+
 const mappingAttributes = {
   link: 'href',
   img: 'src',
@@ -36,23 +37,26 @@ const mappingAttributes = {
   a: 'href',
 };
 
-const getLinksLocalResources = (htmlPage, baseURL) => {
+const getLinksLocalResources = (htmlPage, linkWithBaseUrl) => {
   const $ = cheerio.load(htmlPage);
-
+  const { origin } = new URL(linkWithBaseUrl);
   return Object.keys(mappingAttributes)
-    .reduce((acc, tagName) => [...acc, ...$(tagName).toArray()], [])
-    .reduce((acc, node) => {
+    .flatMap((tagname) => $(tagname).toArray())
+    .filter((node) => {
       const { name } = node;
       const link = $(node).attr(mappingAttributes[name]);
-      return isLocalResource(link, url.parse(baseURL).hostname)
-        ? [...acc, (new URL(link, new URL(baseURL).origin)).href] : acc;
-    }, []);
+      return isLocalResource(link, origin);
+    })
+    .map((node) => {
+      const { name } = node;
+      const link = $(node).attr(mappingAttributes[name]);
+      return genFullLinkFromLocalResource(link, origin);
+    });
 };
 
 const hasLocalResources = (resources) => resources.length > 0;
 
 const saveResorces = (listOfLinks, pathToOutputDir) => {
-  log.info('dowloading local resources');
   const requests = listOfLinks.map((link) => ({
     link,
     promise: axios({
@@ -80,25 +84,20 @@ export default (link, pathToDir) => {
   const pathToFile = path.join(pathToDir, generateFileName(link, '.html'));
   let receivedHtml;
   let htmlForSaving;
+  let localRecources;
+  const pathToLocalFilesDir = path.join(pathToDir, generateFileName(link, '_files'));
   return axios.get(link)
     .then(({ data }) => { receivedHtml = data; })
     .then(() => fs.mkdir(pathToDir, { recursive: true }))
     .then(() => {
-      const localRecources = getLinksLocalResources(receivedHtml, link);
-      if (!hasLocalResources(localRecources)) {
-        htmlForSaving = receivedHtml;
-        return Promise.resolve();
-      }
-      log.info('changing of html');
-      const pathToLocalFilesDir = path.join(pathToDir, generateFileName(link, '_files'));
-      htmlForSaving = changeLocalResorces(receivedHtml, pathToLocalFilesDir, link);
-      return fs.mkdir(pathToLocalFilesDir)
-        .then(() => saveResorces(localRecources, pathToLocalFilesDir));
+      localRecources = getLinksLocalResources(receivedHtml, link);
+      htmlForSaving = !hasLocalResources(localRecources) ? receivedHtml
+        : changeLocalResorces(receivedHtml, pathToLocalFilesDir, link);
     })
-    .then(() => {
-      log.info('saving page');
-      return fs.writeFile(pathToFile, htmlForSaving, 'utf-8');
-    })
+    .then(() => fs.writeFile(pathToFile, htmlForSaving, 'utf-8'))
+    .then(() => (!hasLocalResources(localRecources) ? Promise.resolve()
+      : fs.mkdir(pathToLocalFilesDir)))
+    .then(() => saveResorces(localRecources, pathToLocalFilesDir))
     .catch((error) => {
       log.error(error);
       throw new Error(error);
