@@ -68,7 +68,7 @@ describe('load page with local resources and change the src', () => {
     tempDir, 'check-amount-local-files-com-with-local-files_files',
     fileName,
   );
-  test('size of page with assets should equal the size after loading', async () => {
+  test('check loading page with local files', async () => {
     // Act
     await pageLoader('http://check.amount.local.files.com/with/local/files', tempDir);
     const expectImage = await fs.readFile(getPathToFixture(['pageWithLocalResources', 'assets', 'logo.jpg']));
