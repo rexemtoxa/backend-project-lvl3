@@ -5,8 +5,8 @@ import cheerio from 'cheerio';
 import debug from 'debug';
 import axiosLog from 'axios-debug-log';
 import Listr from 'listr';
+import url from 'url';
 import { generateFileName, isLocalResource, getLocalFileName } from './utils';
-import changeLocalResorces from './changeHtmlPage';
 
 const log = {
   info: debug('page-loader:INFO'),
@@ -36,6 +36,32 @@ const mappingAttributes = {
   script: 'src',
   a: 'href',
 };
+
+const changeSourceByType = (element, type, outputFolder) => {
+  const fileName = getLocalFileName(cheerio(element).attr(type));
+  const newLink = path.join(outputFolder, fileName);
+  cheerio(element).attr(type, newLink);
+};
+
+const changeSourceElement = (element, outputFolder) => {
+  const { name } = element;
+  changeSourceByType(element, mappingAttributes[name], outputFolder);
+};
+
+const changeLocalResorces = (htmlPage, outputFolder, baseURL) => {
+  const $ = cheerio.load(htmlPage);
+  const elementsWithLocalResource = $('[src], [href]').toArray()
+    .filter((element) => {
+      const { name } = element;
+      const link = $(element).attr(mappingAttributes[name]);
+      return isLocalResource(link, url.parse(baseURL).hostname);
+    });
+  elementsWithLocalResource.forEach((element) => {
+    changeSourceElement(element, outputFolder);
+  });
+  return $.html();
+};
+
 
 const getLinksLocalResources = (htmlPage, linkWithBaseUrl) => {
   const $ = cheerio.load(htmlPage);
